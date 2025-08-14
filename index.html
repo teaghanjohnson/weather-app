@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search for Cities..." />
+      <button id="searchBtn">Search</button>
+      <button id="randomBtn">Random Cat</button>
+    </div>
+    <div id="errorMessage" class="error-message"></div>
+    <div id="loadingMessage" class="loading" style="display: none">
+      Loading...
+    </div>
+
+    <img
+      id="gifImage"
+      src="#"
+      alt="GIF will appear here"
+      style="display: none"
+    />
+    <script src="index.js"></script>
+  </body>
+</html>
