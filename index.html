@@ -7,22 +7,28 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search for Cities..." />
+    <div class="header">
+      <h2 class="page-title">Teaghan's Weather App</h2>
+      <div class="search-container">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Enter a location address or latitude,longitude"
+      />
       <button id="searchBtn">Search</button>
-      <button id="randomBtn">Random Cat</button>
     </div>
     <div id="errorMessage" class="error-message"></div>
     <div id="loadingMessage" class="loading" style="display: none">
       Loading...
     </div>
-
     <img
       id="gifImage"
-      src="#"
-      alt="GIF will appear here"
-      style="display: none"
+      src="" 
+      alt="Weather GIF" 
+      style="display: none;
+      max-width: 300px;"
     />
-    <script src="index.js"></script>
+
+    <script src="script.js"></script>
   </body>
 </html>
