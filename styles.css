@@ -41,3 +41,7 @@
 .weather-body {
   background-color: lightblue;
 }
+
+.location-item:hover {
+  text-decoration: underline;
+}
