@@ -7,28 +7,42 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="header">
-      <h2 class="page-title">Teaghan's Weather App</h2>
-      <div class="search-container">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Enter a location address or latitude,longitude"
-      />
-      <button id="searchBtn">Search</button>
+
+    <div class="grid">
+      <div class="header">
+        <h3 class="locationTitle"></h3>
+        <h3 class="page-title">Teaghan's Weather App</h3>
+        <div class="search-container">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Enter a location address or latitude, longitude"
+        />
+        <button id="searchBtn">Search</button>
+        <div id="errorMessage" class="error-message"></div>
+        <div id="loadingMessage" class="loading" style="display: none">
+          Loading...
+        </div>
+        <img id="weatherIcon" 
+          src="" 
+          alt="Weather Icon" 
+          class="hidden" 
+          style="width: 64px; height: 64px;">
+      </div>
+      <div class="weather-body">
+        <img
+          id="gifImage"
+          src=""
+          alt="Weather GIF"
+          class="hidden"
+        />
+        <button id="locationBtn">Use My Location</button>
+        <div id="locationStatus"></div>
+        <div id="currentLocation"></div>
+      </div>
     </div>
-    <div id="errorMessage" class="error-message"></div>
-    <div id="loadingMessage" class="loading" style="display: none">
-      Loading...
-    </div>
-    <img
-      id="gifImage"
-      src="" 
-      alt="Weather GIF" 
-      style="display: none;
-      max-width: 300px;"
-    />
 
     <script src="script.js"></script>
+
   </body>
 </html>

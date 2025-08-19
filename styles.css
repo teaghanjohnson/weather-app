@@ -1,0 +1,43 @@
+.active {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+#searchInput {
+  display: block;
+  border-radius: 10px;
+  height: 30px;
+  width: 300px;
+  border-color: rgb(173, 170, 170);
+  justify-content: flex-end;
+  border: 1px solid #333;
+  box-sizing: border-box;
+  margin-left: 10px;
+}
+#searchInput::placeholder {
+  padding-left: 10px;
+}
+.page-title {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 15px;
+}
+#searchBtn {
+  display: flex;
+}
+
+.grid {
+  grid-template-rows: 1fr, 2fr;
+  height: 100%;
+}
+
+.header {
+  background-color: pink;
+}
+
+.weather-body {
+  background-color: lightblue;
+}
