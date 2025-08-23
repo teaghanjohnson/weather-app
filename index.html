@@ -7,43 +7,76 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-
-    <div class="grid">
+    <div class="site-layout">
       <div class="header">
-        <h2 class="locationTitle"></h2>
         <h3 class="page-title">Teaghan's Weather App</h3>
-        <div class="search-container">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Enter a location address or latitude, longitude"
-        />
-        <button id="searchBtn">Search</button>
-        <div id="errorMessage" class="error-message"></div>
-        <div id="loadingMessage" class="loading" style="display: none">
-          Loading...
+        <div class="main">
+          <p class="locationTitle"></p>
+          <img
+            id="weatherIcon"
+            src=""
+            alt="Weather Icon"
+            style="width: 80px; height: 80px"
+            class="hidden"
+          />
         </div>
-        <img id="weatherIcon" 
-          src="" 
-          alt="Weather Icon" 
-          class="hidden" 
-          style="width: 64px; height: 64px;">
+        <div class="description">
+          <p id="icon-text"></p>
+          <img
+            id="descIcon"
+            src=""
+            alt="Weather Icon"
+            style="width: 80px; height: 80px"
+            class="hidden"
+          />
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Enter a location address or latitude, longitude"
+            class="searchBar"
+          />
+          <button id="searchBtn">
+            <img
+              src="Magnifying_glass_icon.svg.png"
+              alt="search-icon"
+              style="width: 20px; height: 20px"
+            />
+          </button>
+          <button id="locationBtn">Use My Location</button>
+          <div id="errorMessage" class="error-message"></div>
+          <div id="loadingMessage" class="loading" style="display: none">
+            Loading...
+          </div>
+          <img
+            id="weatherIcon"
+            src=""
+            alt="Weather Icon"
+            class="hidden"
+            style="width: 64px; height: 64px"
+          />
+        </div>
       </div>
       <div class="weather-body">
-        <img
-          id="gifImage"
-          src=""
-          alt="Weather GIF"
-          class="hidden"
-        />
-        <button id="locationBtn">Use My Location</button>
+        <div class="body-grid">
+          <div class="sidebar">
+            <div class="weather-info">
+              <div id="current">Current:</div>
+              <div id="feel">Feels Like:</div>
+              <div id="high">Highest:</div>
+              <div id="low">Lowest:</div>
+              <div id="daily-forecast">N/A</div>
+              <div id="places"></div>
+            </div>
+          </div>
+          <div class="main-body">
+            <img id="gifImage" src="" alt="Weather GIF" class="hidden" />
+            <div id="sevenDayForecast"></div>
+          </div>
+        </div>
         <div id="locationStatus"></div>
-        <div id="places"></div>
-        <div id="sevenDayForecast"></div>
       </div>
     </div>
 
     <script src="script.js"></script>
-
   </body>
 </html>

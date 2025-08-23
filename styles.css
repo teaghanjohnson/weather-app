@@ -6,42 +6,120 @@
   display: none;
 }
 
-#searchInput {
-  display: block;
-  border-radius: 10px;
-  height: 30px;
-  width: 300px;
-  border-color: rgb(173, 170, 170);
-  justify-content: flex-end;
-  border: 1px solid #333;
-  box-sizing: border-box;
-  margin-left: 10px;
-}
-#searchInput::placeholder {
-  padding-left: 10px;
-}
-.page-title {
-  display: flex;
-  justify-content: flex-end;
-  font-size: 15px;
-}
-#searchBtn {
-  display: flex;
-}
-
-.grid {
-  grid-template-rows: 1fr, 2fr;
-  height: 100%;
-}
-
 .header {
+  display: flex;
+  flex-direction: column;
   background-color: pink;
+  padding: 20px;
 }
 
 .weather-body {
   background-color: lightblue;
+  padding: 20px;
+}
+
+.body-grid {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 10px;
+  height: 100%;
+}
+
+.sidebar {
+  border: 1px solid black;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.main-body {
+  border: 1px solid gold;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.description {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.description {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.searchBar {
+  display: block;
+  border-radius: 10px;
+  height: 30px;
+  width: 300px;
+  border: 1px solid rgb(121, 121, 121);
+  box-sizing: border-box;
+  padding-left: 10px;
+}
+
+.searchBar::placeholder {
+  padding-left: 5px;
+}
+
+#searchBtn {
+  display: inline-block;
+  height: 32px;
+  padding: 5px 8px;
+  border: 1px solid #333;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#locationBtn {
+  padding: 8px 12px;
+  border: 1px solid #333;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#sevenDayForecast {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.forecast-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.weather-info div {
+  margin: 8px 0;
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 5px;
 }
 
 .location-item:hover {
   text-decoration: underline;
+  cursor: pointer;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+.loading {
+  color: blue;
+  font-weight: bold;
 }

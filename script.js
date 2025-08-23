@@ -1,13 +1,18 @@
 const img = document.getElementById("gifImage");
 const iconElement = document.getElementById("weatherIcon");
+const descIcon = document.getElementById("descIcon");
 img.classList = "hidden";
-iconElement.classList = "hidden";
+iconElement.classList.add("hidden");
+descIcon.classList.add("hidden");
 const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
 const errorMessage = document.getElementById("errorMessage");
 const loadingMessage = document.getElementById("loadingMessage");
 const locationTitle = document.querySelector(".locationTitle");
 const locationBtn = document.getElementById("locationBtn");
+const iconText = document.getElementById("icon-text");
+const warningInput = document.getElementById("warningInput");
+const warningSearchBtn = document.querySelector(".warningSearch");
 
 const gif_API_KEY = "5QIQupLO1PzZFkXg5t2tev9MBKy2FyeY";
 const gif_BASE_URL = `https://api.giphy.com/v1/gifs/translate?api_key=${gif_API_KEY}&s=`;
@@ -69,8 +74,7 @@ async function getWeather(location) {
   }
 }
 
-async function searchLocation() {
-  const location = searchInput.value.trim();
+async function performWeatherSearch(location) {
   if (!location) {
     showError("Please enter a city!");
     return;
@@ -78,27 +82,48 @@ async function searchLocation() {
 
   try {
     showLoading();
-
     const weatherData = await getWeather(location);
     const conditions = `${weatherData.currentConditions.icon} weather`;
-    const gifUrl = await loadGIF(conditions);
+    //const gifUrl = await loadGIF(conditions);
 
     displayWeatherIcon(weatherData);
-    displayGIF(gifUrl);
+    //displayGIF(gifUrl);
     addToLocationList(location);
-
     locationTitle.textContent = `${weatherData.address}`;
+    iconText.textContent = `${weatherData.currentConditions.icon}`;
 
-    console.log("Getting 7-day forecast...");
     const forecastDays = await get7DayForecast(location);
-    console.log("Forecast data:", forecastDays); // Debug log
     display7DayForecast(forecastDays);
+
+    const feelTemp = document.getElementById("feel");
+    const highTemp = document.getElementById("high");
+    const lowTemp = document.getElementById("low");
+    const currentTemp = document.getElementById("current");
+
+    const feelFahrenheit = parseInt(weatherData.currentConditions.feelslike);
+    const highFahrenheit = parseInt(weatherData.currentConditions.tempmax);
+    const lowFahrenheit = parseInt(weatherData.currentConditions.tempmin);
+    const currentFahrenheit = parseInt(weatherData.currentConditions.temp);
+
+    feelTemp.textContent += ` ${Math.floor(fahrenheitToCelsius(feelFahrenheit))}`;
+    highTemp.textContent += ` ${Math.floor(fahrenheitToCelsius(highFahrenheit))}`;
+    lowTemp.textContent += ` ${Math.floor(fahrenheitToCelsius(lowFahrenheit))}`;
+    currentTemp.textContent += ` ${Math.floor(fahrenheitToCelsius(currentFahrenheit))}`;
 
     hideLoading();
   } catch (err) {
     console.error("Error", err);
     hideLoading();
   }
+}
+async function searchLocation() {
+  const location = searchInput.value.trim();
+  await performWeatherSearch(location);
+}
+
+async function searchLocationTwo() {
+  const location = warningInput.value.trim();
+  await performWeatherSearch(location);
 }
 
 function displayGIF(gifUrl) {
@@ -151,9 +176,7 @@ function addToLocationList(locationName) {
       displayGIF(gifUrl);
 
       locationTitle.textContent = listItem.textContent;
-
-      const forecastDays = await get7DayForecast(listItem.textContent);
-      display7DayForecast(forecastDays);
+      hideLoading();
     } catch (error) {
       console.error("Weather loading error: ", error);
       showError("Failed to get weather for your location.");
@@ -176,7 +199,7 @@ function getDates() {
 
 function fahrenheitToCelsius(fahrenheit) {
   const celsius = Math.floor(((fahrenheit - 32) * 5) / 9);
-  return `The temperature is ${celsius}.`;
+  return celsius;
 }
 
 async function loadGIF(weatherConditions) {
@@ -261,6 +284,9 @@ function displayWeatherIcon(weatherData) {
   iconElement.classList = "active";
   iconElement.src = iconUrl;
   iconElement.style.display = "block";
+  descIcon.classList = "active";
+  descIcon.src = iconUrl;
+  descIcon.style.display = "block";
 }
 
 async function reverseGeocode(lat, lon) {
@@ -343,9 +369,31 @@ function getCurrentLocation() {
         const weatherData = await getWeather(cityName);
         const conditions = `${weatherData.currentConditions.icon} weather`;
         const gifUrl = await loadGIF(conditions);
+        const forecastDays = await get7DayForecast(cityName);
+
         displayWeatherIcon(weatherData);
         displayGIF(gifUrl);
         addToLocationList(cityName);
+        display7DayForecast(forecastDays);
+
+        // After your existing weatherData fetch, add this:
+        const todaysData = weatherData.days[0]; // Get just the first day
+
+        // Then use it for your temperature elements:
+        const highFahrenheit = parseInt(todaysData.tempmax);
+        const lowFahrenheit = parseInt(todaysData.tempmin);
+
+        /*
+        const feelTemp = document.getElementById("feel");
+        const highTemp = document.getElementById("high");
+        const lowTemp = document.getElementById("low");
+        const currentTemp = document.getElementById("current");
+    
+        feelTemp.textContent = `${Math.floor(fahrenheitToCelsius(weatherData.days.feelslike))}`;
+        highTemp.textContent = `${Math.floor(fahrenheitToCelsius(weatherData.days.tempmax))}`;
+        lowTemp.textContent = `${Math.floor(fahrenheitToCelsius(weatherData.days.tempmin))}`;
+        currentTemp.textContent = `${Math.floor(fahrenheitToCelsius(weatherData.days.temp))}`;
+        */
       } catch (error) {
         console.error("Weather loading error: ", error);
         showError("Failed to get weather for your location.");
@@ -468,31 +516,30 @@ function display7DayForecast(forecastDays) {
     console.error("7-day forecast container not found");
     return;
   }
-
   forecastContainer.innerHTML = "";
 
   forecastDays.forEach((day, index) => {
-    console.log(`Day ${index}:`, day);
-
     const dayElement = document.createElement("div");
     dayElement.classList.add("forecast-day");
 
     const dayName = getDayName(day.datetime);
-    const highTemp = Math.round(day.tempmax);
-    const lowTemp = Math.round(day.tempmin);
+    const highTemp = Math.floor(day.tempmax);
+    const lowTemp = Math.floor(day.tempmin);
     const icon = day.icon;
     const condition = day.conditions;
 
     console.log(`${dayName}: ${highTemp}°/${lowTemp}°, ${condition}`); // Debug log
 
     dayElement.innerHTML = `
-      <div class="day-icon">
-        <img src="${getWeatherIcon(icon)}" alt="${condition}" class="forecast-icon">
-      </div>
-      <div class="day-name">${dayName}</div>
-      <div class="day-temps">
-        <span class="high-temp"> H: ${highTemp}°</span>
-        <span class="low-temp"> L: ${lowTemp}°</span>
+      <div class="forecast-item">
+        <div class="day-icon">
+          <img src="${getWeatherIcon(icon)}" alt="${condition}" class="forecast-icon">
+        </div>
+        <div class="day-name">${dayName}</div>
+        <div class="day-temps">
+          <span class="high-temp"> H: ${fahrenheitToCelsius(highTemp)}°</span>
+          <span class="low-temp"> L: ${fahrenheitToCelsius(lowTemp)}°</span>
+        </div>
       </div>
     `;
 
@@ -520,4 +567,4 @@ function getNext7DayNames() {
   return next7Days;
 }
 
-console.log("next 7 days:", getNext7DayNames());
+autoDetectLocation();
