@@ -6,15 +6,18 @@
   display: none;
 }
 
+.site-layout {
+  background: var(--bg-gradient);
+  color: var(--text-color);
+}
+
 .header {
   display: flex;
   flex-direction: column;
-  background-color: pink;
   padding: 20px;
 }
 
 .weather-body {
-  background-color: lightblue;
   padding: 20px;
 }
 
@@ -71,6 +74,10 @@
   padding-left: 5px;
 }
 
+.searchBar:focus {
+  border-color: var(--accent-color);
+}
+
 #searchBtn {
   display: inline-block;
   height: 32px;
@@ -87,6 +94,15 @@
   background-color: white;
   cursor: pointer;
   border-radius: 5px;
+}
+
+#searchBtn,
+#locationBtn {
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+}
+
+#current {
 }
 
 #sevenDayForecast {
@@ -122,4 +138,14 @@
 .loading {
   color: blue;
   font-weight: bold;
+}
+.page-title {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.locationTitle {
+  font-weight: 500;
+  font-size: 60px;
+  font-family: "Prata", serif;
 }

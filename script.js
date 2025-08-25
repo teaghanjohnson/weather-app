@@ -84,11 +84,10 @@ async function performWeatherSearch(location) {
     showLoading();
     const weatherData = await getWeather(location);
     const conditions = `${weatherData.currentConditions.icon} weather`;
-    //const gifUrl = await loadGIF(conditions);
 
     displayWeatherIcon(weatherData);
-    //displayGIF(gifUrl);
     addToLocationList(location);
+    changeWeatherTheme(weatherData);
     locationTitle.textContent = `${weatherData.address}`;
     iconText.textContent = `${weatherData.currentConditions.icon}`;
 
@@ -101,14 +100,16 @@ async function performWeatherSearch(location) {
     const currentTemp = document.getElementById("current");
 
     const feelFahrenheit = parseInt(weatherData.currentConditions.feelslike);
-    const highFahrenheit = parseInt(weatherData.currentConditions.tempmax);
-    const lowFahrenheit = parseInt(weatherData.currentConditions.tempmin);
     const currentFahrenheit = parseInt(weatherData.currentConditions.temp);
 
-    feelTemp.textContent += ` ${Math.floor(fahrenheitToCelsius(feelFahrenheit))}`;
-    highTemp.textContent += ` ${Math.floor(fahrenheitToCelsius(highFahrenheit))}`;
-    lowTemp.textContent += ` ${Math.floor(fahrenheitToCelsius(lowFahrenheit))}`;
-    currentTemp.textContent += ` ${Math.floor(fahrenheitToCelsius(currentFahrenheit))}`;
+    const todaysForecast = weatherData.days[0];
+    const highFahrenheit = parseInt(todaysForecast.tempmax);
+    const lowFahrenheit = parseInt(todaysForecast.tempmin);
+
+    feelTemp.textContent = ` Feels Like: ${Math.floor(fahrenheitToCelsius(feelFahrenheit))}°`;
+    highTemp.textContent = ` Highest: ${Math.floor(fahrenheitToCelsius(highFahrenheit))}°`;
+    lowTemp.textContent = ` Lowest: ${Math.floor(fahrenheitToCelsius(lowFahrenheit))}°`;
+    currentTemp.textContent = `Current: ${Math.floor(fahrenheitToCelsius(currentFahrenheit))}°`;
 
     hideLoading();
   } catch (err) {
@@ -366,34 +367,8 @@ function getCurrentLocation() {
           statusElement.textContent = "";
         }, 3000);
 
-        const weatherData = await getWeather(cityName);
-        const conditions = `${weatherData.currentConditions.icon} weather`;
-        const gifUrl = await loadGIF(conditions);
-        const forecastDays = await get7DayForecast(cityName);
-
-        displayWeatherIcon(weatherData);
-        displayGIF(gifUrl);
-        addToLocationList(cityName);
-        display7DayForecast(forecastDays);
-
+        performWeatherSearch(cityName);
         // After your existing weatherData fetch, add this:
-        const todaysData = weatherData.days[0]; // Get just the first day
-
-        // Then use it for your temperature elements:
-        const highFahrenheit = parseInt(todaysData.tempmax);
-        const lowFahrenheit = parseInt(todaysData.tempmin);
-
-        /*
-        const feelTemp = document.getElementById("feel");
-        const highTemp = document.getElementById("high");
-        const lowTemp = document.getElementById("low");
-        const currentTemp = document.getElementById("current");
-    
-        feelTemp.textContent = `${Math.floor(fahrenheitToCelsius(weatherData.days.feelslike))}`;
-        highTemp.textContent = `${Math.floor(fahrenheitToCelsius(weatherData.days.tempmax))}`;
-        lowTemp.textContent = `${Math.floor(fahrenheitToCelsius(weatherData.days.tempmin))}`;
-        currentTemp.textContent = `${Math.floor(fahrenheitToCelsius(weatherData.days.temp))}`;
-        */
       } catch (error) {
         console.error("Weather loading error: ", error);
         showError("Failed to get weather for your location.");
@@ -565,6 +540,130 @@ function getNext7DayNames() {
     next7Days.push(days[date.getDay()]);
   }
   return next7Days;
+}
+
+const weatherThemes = {
+  "clear-day": {
+    background: "linear-gradient(135deg, #87CEEB, #E0F6FF)",
+    textColor: "#2C3E50",
+    accentColor: "#4A90E2",
+  },
+  "clear-night": {
+    background: "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
+    textColor: "#F8F9FA",
+    accentColor: "#FFD700",
+  },
+  cloudy: {
+    background: "linear-gradient(135deg, #95A5A6, #BDC3C7)",
+    textColor: "#2C3E50",
+    accentColor: "#34495E",
+  },
+  "partly-cloudy-day": {
+    background: "linear-gradient(135deg, #74b9ff, #a29bfe, #ddd6fe)",
+    textColor: "#2C3E50",
+    accentColor: "#6c5ce7",
+  },
+  "partly-cloudy-night": {
+    background: "linear-gradient(135deg, #2d3436, #636e72, #74b9ff)",
+    textColor: "#ddd6fe",
+    accentColor: "#fdcb6e",
+  },
+  rain: {
+    background: "linear-gradient(135deg, #34495e, #2c3e50, #1abc9c)",
+    textColor: "#ecf0f1",
+    accentColor: "#3498db",
+  },
+  snow: {
+    background: "linear-gradient(135deg, #ecf0f1, #bdc3c7, #95a5a6)",
+    textColor: "#2c3e50",
+    accentColor: "#74b9ff",
+  },
+  sleet: {
+    background: "linear-gradient(135deg, #636e72, #95a5a6, #74b9ff)",
+    textColor: "#2c3e50",
+    accentColor: "#0984e3",
+  },
+  "showers-day": {
+    background: "linear-gradient(135deg, #55a3ff, #74b9ff, #a29bfe)",
+    textColor: "#2c3e50",
+    accentColor: "#0984e3",
+  },
+  "showers-night": {
+    background: "linear-gradient(135deg, #2d3436, #636e72, #74b9ff)",
+    textColor: "#ddd6fe",
+    accentColor: "#81ecec",
+  },
+  "snow-showers-day": {
+    background: "linear-gradient(135deg, #ddd6fe, #74b9ff, #ecf0f1)",
+    textColor: "#2c3e50",
+    accentColor: "#6c5ce7",
+  },
+  "snow-showers-night": {
+    background: "linear-gradient(135deg, #2d3436, #74b9ff, #ddd6fe)",
+    textColor: "#ecf0f1",
+    accentColor: "#81ecec",
+  },
+  "thunder-rain": {
+    background: "linear-gradient(135deg, #2C3E50, #34495E, #1ABC9C)",
+    textColor: "#ECF0F1",
+    accentColor: "#F1C40F",
+  },
+  "thunder-showers-day": {
+    background: "linear-gradient(135deg, #2d3436, #636e72, #fdcb6e)",
+    textColor: "#2c3e50",
+    accentColor: "#e17055",
+  },
+  "thunder-showers-night": {
+    background: "linear-gradient(135deg, #2d3436, #636e72, #6c5ce7)",
+    textColor: "#ddd6fe",
+    accentColor: "#ffeaa7",
+  },
+  fog: {
+    background: "linear-gradient(135deg, #b2bec3, #ddd6fe, #ecf0f1)",
+    textColor: "#2c3e50",
+    accentColor: "#636e72",
+  },
+  wind: {
+    background: "linear-gradient(135deg, #74b9ff, #0984e3, #00b894)",
+    textColor: "#2c3e50",
+    accentColor: "#00cec9",
+  },
+  hail: {
+    background: "linear-gradient(135deg, #636e72, #b2bec3, #74b9ff)",
+    textColor: "#2c3e50",
+    accentColor: "#0984e3",
+  },
+  tornado: {
+    background: "linear-gradient(135deg, #2d3436, #636e72, #e17055)",
+    textColor: "#ddd6fe",
+    accentColor: "#fd79a8",
+  },
+  hurricane: {
+    background: "linear-gradient(135deg, #2d3436, #636e72, #e84393)",
+    textColor: "#ddd6fe",
+    accentColor: "#00b894",
+  },
+  sunrise: {
+    background: "linear-gradient(135deg, #ffeaa7, #fab1a0, #fd79a8)",
+    textColor: "#2d3436",
+    accentColor: "#e84393",
+  },
+  sunset: {
+    background: "linear-gradient(135deg, #fd79a8, #fdcb6e, #e84393)",
+    textColor: "#2d3436",
+    accentColor: "#a29bfe",
+  },
+};
+
+function changeWeatherTheme(weatherData) {
+  const iconName = weatherData.currentConditions.icon;
+  const theme = weatherThemes[iconName];
+  if (theme) {
+    const root = document.documentElement;
+    root.style.setProperty("--bg-gradient", theme.background);
+    root.style.setProperty("--text-color", theme.textColor);
+    root.style.setProperty("--accent-color", theme.accentColor);
+  }
 }
 
 autoDetectLocation();
