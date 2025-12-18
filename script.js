@@ -11,8 +11,11 @@ const loadingMessage = document.getElementById("loadingMessage");
 const locationTitle = document.querySelector(".locationTitle");
 const locationBtn = document.getElementById("locationBtn");
 const iconText = document.getElementById("icon-text");
-const warningInput = document.getElementById("warningInput");
-const warningSearchBtn = document.querySelector(".warningSearch");
+const unitToggle = document.getElementById("unitToggle");
+
+// Temperature unit state (true = Celsius, false = Fahrenheit)
+let isCelsius = true;
+let currentWeatherData = null;
 
 const gif_API_KEY = "5QIQupLO1PzZFkXg5t2tev9MBKy2FyeY";
 const gif_BASE_URL = `https://api.giphy.com/v1/gifs/translate?api_key=${gif_API_KEY}&s=`;
@@ -83,7 +86,7 @@ async function performWeatherSearch(location) {
   try {
     showLoading();
     const weatherData = await getWeather(location);
-    const conditions = `${weatherData.currentConditions.icon} weather`;
+    currentWeatherData = weatherData;
 
     displayWeatherIcon(weatherData);
     addToLocationList(location);
@@ -94,22 +97,7 @@ async function performWeatherSearch(location) {
     const forecastDays = await get7DayForecast(location);
     display7DayForecast(forecastDays);
 
-    const feelTemp = document.getElementById("feel");
-    const highTemp = document.getElementById("high");
-    const lowTemp = document.getElementById("low");
-    const currentTemp = document.getElementById("current");
-
-    const feelFahrenheit = parseInt(weatherData.currentConditions.feelslike);
-    const currentFahrenheit = parseInt(weatherData.currentConditions.temp);
-
-    const todaysForecast = weatherData.days[0];
-    const highFahrenheit = parseInt(todaysForecast.tempmax);
-    const lowFahrenheit = parseInt(todaysForecast.tempmin);
-
-    feelTemp.textContent = ` Feels Like: ${Math.floor(fahrenheitToCelsius(feelFahrenheit))}°`;
-    highTemp.textContent = ` Highest: ${Math.floor(fahrenheitToCelsius(highFahrenheit))}°`;
-    lowTemp.textContent = ` Lowest: ${Math.floor(fahrenheitToCelsius(lowFahrenheit))}°`;
-    currentTemp.textContent = `Current: ${Math.floor(fahrenheitToCelsius(currentFahrenheit))}°`;
+    updateTemperatureDisplay();
 
     hideLoading();
   } catch (err) {
@@ -122,10 +110,6 @@ async function searchLocation() {
   await performWeatherSearch(location);
 }
 
-async function searchLocationTwo() {
-  const location = warningInput.value.trim();
-  await performWeatherSearch(location);
-}
 
 function displayGIF(gifUrl) {
   img.src = gifUrl;
@@ -194,13 +178,54 @@ function addToLocationList(locationName) {
     placesList.removeChild(placesList.firstChild);
   }
 }
-function getDates() {
-  //User chooses dates on a calendar they would like weather(lenght subject to API)
-}
 
 function fahrenheitToCelsius(fahrenheit) {
   const celsius = Math.floor(((fahrenheit - 32) * 5) / 9);
   return celsius;
+}
+
+function celsiusToFahrenheit(celsius) {
+  return Math.floor((celsius * 9) / 5 + 32);
+}
+
+function convertTemperature(temp) {
+  return isCelsius ? fahrenheitToCelsius(temp) : Math.floor(temp);
+}
+
+function getTemperatureUnit() {
+  return isCelsius ? "°C" : "°F";
+}
+
+function updateTemperatureDisplay() {
+  if (!currentWeatherData) return;
+
+  const feelTemp = document.getElementById("feel");
+  const highTemp = document.getElementById("high");
+  const lowTemp = document.getElementById("low");
+  const currentTemp = document.getElementById("current");
+  const humidityElement = document.getElementById("humidity");
+  const windElement = document.getElementById("wind");
+
+  const feelFahrenheit = parseInt(currentWeatherData.currentConditions.feelslike);
+  const currentFahrenheit = parseInt(currentWeatherData.currentConditions.temp);
+
+  const todaysForecast = currentWeatherData.days[0];
+  const highFahrenheit = parseInt(todaysForecast.tempmax);
+  const lowFahrenheit = parseInt(todaysForecast.tempmin);
+
+  const unit = getTemperatureUnit();
+
+  feelTemp.textContent = `Feels Like: ${convertTemperature(feelFahrenheit)}${unit}`;
+  highTemp.textContent = `Highest: ${convertTemperature(highFahrenheit)}${unit}`;
+  lowTemp.textContent = `Lowest: ${convertTemperature(lowFahrenheit)}${unit}`;
+  currentTemp.textContent = `Current: ${convertTemperature(currentFahrenheit)}${unit}`;
+
+  humidityElement.textContent = `Humidity: ${currentWeatherData.currentConditions.humidity}%`;
+
+  const windSpeed = currentWeatherData.currentConditions.windspeed;
+  const windSpeedKmh = isCelsius ? Math.floor(windSpeed * 1.60934) : Math.floor(windSpeed);
+  const windUnit = isCelsius ? "km/h" : "mph";
+  windElement.textContent = `Wind: ${windSpeedKmh} ${windUnit}`;
 }
 
 async function loadGIF(weatherConditions) {
@@ -398,28 +423,6 @@ function getCurrentLocation() {
   );
 }
 
-/*async function loadWeatherByCoordinates(lat, lon) {
-  try {
-    // process coordinates in lat,lon format
-    const location = `${lat}, ${lon}`;
-    const weatherData = await getWeather(location);
-
-    // Display weather data same as the manual search
-    const conditions = `${weatherData.currentConditions.icon} weather`;
-    const gifUrl = await loadGIF(conditions);
-    displayWeatherIcon(weatherData);
-    displayGIF(gifUrl);
-
-    // update UI to show resolved location name
-    updateLocationDisplay(weatherData.address);
-
-    return weatherData;
-  } catch (error) {
-    console.error("Error loadding weather by coordinates:", error);
-    throw error;
-  }
-}
-  */
 
 function autoDetectLocation() {
   const autoDetect = confirm(
@@ -428,11 +431,21 @@ function autoDetectLocation() {
   if (autoDetect) {
     getCurrentLocation();
   } else {
+    // Default to Toronto, Ontario when user declines location access
+    performWeatherSearch("Toronto, Ontario");
   }
 }
 
 locationBtn.addEventListener("click", () => {
   autoDetectLocation();
+});
+
+unitToggle.addEventListener("click", () => {
+  isCelsius = !isCelsius;
+  updateTemperatureDisplay();
+  if (currentWeatherData) {
+    display7DayForecast(currentWeatherData.days.slice(1, 8));
+  }
 });
 
 // get next 7 day forecast not including today
@@ -505,6 +518,8 @@ function display7DayForecast(forecastDays) {
 
     console.log(`${dayName}: ${highTemp}°/${lowTemp}°, ${condition}`); // Debug log
 
+    const unit = getTemperatureUnit();
+
     dayElement.innerHTML = `
       <div class="forecast-item">
         <div class="day-icon">
@@ -512,8 +527,8 @@ function display7DayForecast(forecastDays) {
         </div>
         <div class="day-name">${dayName}</div>
         <div class="day-temps">
-          <span class="high-temp"> H: ${fahrenheitToCelsius(highTemp)}°</span>
-          <span class="low-temp"> L: ${fahrenheitToCelsius(lowTemp)}°</span>
+          <span class="high-temp">H: ${convertTemperature(highTemp)}${unit}</span>
+          <span class="low-temp">L: ${convertTemperature(lowTemp)}${unit}</span>
         </div>
       </div>
     `;
@@ -544,114 +559,114 @@ function getNext7DayNames() {
 
 const weatherThemes = {
   "clear-day": {
-    background: "linear-gradient(135deg, #87CEEB, #E0F6FF)",
-    textColor: "#2C3E50",
-    accentColor: "#4A90E2",
+    background: "linear-gradient(135deg, #4A90E2, #87CEEB, #FFD700)",
+    textColor: "#1a1a1a",
+    accentColor: "#FFB347",
   },
   "clear-night": {
-    background: "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
-    textColor: "#F8F9FA",
+    background: "linear-gradient(135deg, #0c0c1e, #1a1a3e, #2d2d5f)",
+    textColor: "#E8E8E8",
     accentColor: "#FFD700",
   },
   cloudy: {
-    background: "linear-gradient(135deg, #95A5A6, #BDC3C7)",
-    textColor: "#2C3E50",
-    accentColor: "#34495E",
+    background: "linear-gradient(135deg, #707070, #9E9E9E, #BDBDBD)",
+    textColor: "#1a1a1a",
+    accentColor: "#5C5C5C",
   },
   "partly-cloudy-day": {
-    background: "linear-gradient(135deg, #74b9ff, #a29bfe, #ddd6fe)",
-    textColor: "#2C3E50",
-    accentColor: "#6c5ce7",
+    background: "linear-gradient(135deg, #87CEEB, #B0C4DE, #F0F0F0)",
+    textColor: "#1a1a1a",
+    accentColor: "#4A90E2",
   },
   "partly-cloudy-night": {
-    background: "linear-gradient(135deg, #2d3436, #636e72, #74b9ff)",
-    textColor: "#ddd6fe",
-    accentColor: "#fdcb6e",
+    background: "linear-gradient(135deg, #1a1a2e, #2d2d4a, #4a4a6a)",
+    textColor: "#E8E8E8",
+    accentColor: "#FFD700",
   },
   rain: {
-    background: "linear-gradient(135deg, #34495e, #2c3e50, #1abc9c)",
-    textColor: "#ecf0f1",
+    background: "linear-gradient(135deg, #2C3E50, #34495E, #5D6D7E)",
+    textColor: "#E8E8E8",
     accentColor: "#3498db",
   },
   snow: {
-    background: "linear-gradient(135deg, #ecf0f1, #bdc3c7, #95a5a6)",
-    textColor: "#2c3e50",
-    accentColor: "#74b9ff",
+    background: "linear-gradient(135deg, #E8E8E8, #FFFFFF, #D3D3D3)",
+    textColor: "#1a1a1a",
+    accentColor: "#87CEEB",
   },
   sleet: {
-    background: "linear-gradient(135deg, #636e72, #95a5a6, #74b9ff)",
-    textColor: "#2c3e50",
-    accentColor: "#0984e3",
+    background: "linear-gradient(135deg, #5D6D7E, #8B9DA9, #B0BEC5)",
+    textColor: "#1a1a1a",
+    accentColor: "#546E7A",
   },
   "showers-day": {
-    background: "linear-gradient(135deg, #55a3ff, #74b9ff, #a29bfe)",
-    textColor: "#2c3e50",
-    accentColor: "#0984e3",
+    background: "linear-gradient(135deg, #5DADE2, #85C1E2, #AED6F1)",
+    textColor: "#1a1a1a",
+    accentColor: "#2E86C1",
   },
   "showers-night": {
-    background: "linear-gradient(135deg, #2d3436, #636e72, #74b9ff)",
-    textColor: "#ddd6fe",
-    accentColor: "#81ecec",
+    background: "linear-gradient(135deg, #1C2833, #2C3E50, #34495E)",
+    textColor: "#E8E8E8",
+    accentColor: "#5DADE2",
   },
   "snow-showers-day": {
-    background: "linear-gradient(135deg, #ddd6fe, #74b9ff, #ecf0f1)",
-    textColor: "#2c3e50",
-    accentColor: "#6c5ce7",
+    background: "linear-gradient(135deg, #D6EAF8, #EBF5FB, #FFFFFF)",
+    textColor: "#1a1a1a",
+    accentColor: "#5DADE2",
   },
   "snow-showers-night": {
-    background: "linear-gradient(135deg, #2d3436, #74b9ff, #ddd6fe)",
-    textColor: "#ecf0f1",
-    accentColor: "#81ecec",
+    background: "linear-gradient(135deg, #0E1621, #1C2833, #34495E)",
+    textColor: "#E8E8E8",
+    accentColor: "#AED6F1",
   },
   "thunder-rain": {
-    background: "linear-gradient(135deg, #2C3E50, #34495E, #1ABC9C)",
-    textColor: "#ECF0F1",
-    accentColor: "#F1C40F",
+    background: "linear-gradient(135deg, #1C1C1C, #2C3E50, #34495E)",
+    textColor: "#E8E8E8",
+    accentColor: "#F4D03F",
   },
   "thunder-showers-day": {
-    background: "linear-gradient(135deg, #2d3436, #636e72, #fdcb6e)",
-    textColor: "#2c3e50",
-    accentColor: "#e17055",
+    background: "linear-gradient(135deg, #34495E, #5D6D7E, #85929E)",
+    textColor: "#E8E8E8",
+    accentColor: "#F39C12",
   },
   "thunder-showers-night": {
-    background: "linear-gradient(135deg, #2d3436, #636e72, #6c5ce7)",
-    textColor: "#ddd6fe",
-    accentColor: "#ffeaa7",
+    background: "linear-gradient(135deg, #0B0B0F, #1C2833, #273746)",
+    textColor: "#E8E8E8",
+    accentColor: "#F4D03F",
   },
   fog: {
-    background: "linear-gradient(135deg, #b2bec3, #ddd6fe, #ecf0f1)",
-    textColor: "#2c3e50",
-    accentColor: "#636e72",
+    background: "linear-gradient(135deg, #AAB7B8, #D5DBDB, #ECF0F1)",
+    textColor: "#1a1a1a",
+    accentColor: "#7F8C8D",
   },
   wind: {
-    background: "linear-gradient(135deg, #74b9ff, #0984e3, #00b894)",
-    textColor: "#2c3e50",
-    accentColor: "#00cec9",
+    background: "linear-gradient(135deg, #5DADE2, #85C1E2, #AED6F1)",
+    textColor: "#1a1a1a",
+    accentColor: "#2874A6",
   },
   hail: {
-    background: "linear-gradient(135deg, #636e72, #b2bec3, #74b9ff)",
-    textColor: "#2c3e50",
-    accentColor: "#0984e3",
+    background: "linear-gradient(135deg, #717D7E, #99A3A4, #D5DBDB)",
+    textColor: "#1a1a1a",
+    accentColor: "#566573",
   },
   tornado: {
-    background: "linear-gradient(135deg, #2d3436, #636e72, #e17055)",
-    textColor: "#ddd6fe",
-    accentColor: "#fd79a8",
+    background: "linear-gradient(135deg, #1C1C1C, #424949, #566573)",
+    textColor: "#E8E8E8",
+    accentColor: "#E74C3C",
   },
   hurricane: {
-    background: "linear-gradient(135deg, #2d3436, #636e72, #e84393)",
-    textColor: "#ddd6fe",
-    accentColor: "#00b894",
+    background: "linear-gradient(135deg, #0B1F2E, #1C3A50, #2C5F77)",
+    textColor: "#E8E8E8",
+    accentColor: "#E74C3C",
   },
   sunrise: {
-    background: "linear-gradient(135deg, #ffeaa7, #fab1a0, #fd79a8)",
-    textColor: "#2d3436",
-    accentColor: "#e84393",
+    background: "linear-gradient(135deg, #FFA726, #FFCC80, #FFE082)",
+    textColor: "#1a1a1a",
+    accentColor: "#F57C00",
   },
   sunset: {
-    background: "linear-gradient(135deg, #fd79a8, #fdcb6e, #e84393)",
-    textColor: "#2d3436",
-    accentColor: "#a29bfe",
+    background: "linear-gradient(135deg, #FF7043, #FFAB91, #FFCC80)",
+    textColor: "#1a1a1a",
+    accentColor: "#E64A19",
   },
 };
 

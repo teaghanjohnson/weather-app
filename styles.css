@@ -146,6 +146,28 @@ body {
   transform: translateY(0);
 }
 
+#unitToggle {
+  padding: 8px 16px;
+  border: none;
+  background-color: var(--accent-color, #4A90E2);
+  color: white;
+  cursor: pointer;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#unitToggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+#unitToggle:active {
+  transform: translateY(0);
+}
+
 .weather-body {
   padding: 0 20px 20px;
 }

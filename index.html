@@ -15,7 +15,10 @@
   <body>
     <div class="site-layout">
       <div class="header">
-        <h3 class="page-title">Teaghan's Weather App</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 class="page-title" style="margin-bottom: 0;">Teaghan's Weather App</h3>
+          <button id="unitToggle" title="Toggle temperature unit">°C / °F</button>
+        </div>
         <div class="main">
           <p class="locationTitle"></p>
           <img
@@ -70,6 +73,8 @@
               <div id="feel">Feels Like:</div>
               <div id="high">Highest:</div>
               <div id="low">Lowest:</div>
+              <div id="humidity">Humidity:</div>
+              <div id="wind">Wind:</div>
               <div id="daily-forecast">N/A</div>
               <div id="places"></div>
             </div>
