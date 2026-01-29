@@ -6,6 +6,8 @@ A modern, responsive weather application built with vanilla JavaScript that prov
 ![JavaScript](https://img.shields.io/badge/javascript-ES6+-yellow.svg)
 ![CSS3](https://img.shields.io/badge/css-3-blue.svg)
 
+![Weather App Screenshot](screenshots/screenshot.png)
+
 ## Features
 
 ### Core Functionality
@@ -43,7 +45,7 @@ A modern, responsive weather application built with vanilla JavaScript that prov
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/weather-app.git
+git clone https://github.com/teaghanjohnson/weather-app.git
 cd weather-app
 ```
 
@@ -230,8 +232,8 @@ This project is open source and available for educational purposes.
 
 ## Contact
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Portfolio: [your-website.com](https://your-website.com)
+- GitHub: [@teaghanjohnson](https://github.com/teaghanjohnson)
+- LinkedIn: [Teaghan Johnson](https://www.linkedin.com/in/teaghan-johnson-510b95324/)
 
 ---
 

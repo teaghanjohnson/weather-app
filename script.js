@@ -343,7 +343,7 @@ async function reverseGeocode(lat, lon) {
       } else if (city && country) {
         cityName = `${city}, ${country}`;
       } else {
-        (cityName = data.display_name.split(",")).slice(0, 2).join(", ");
+        cityName = data.display_name.split(",").slice(0, 2).join(", ");
       }
     }
     console.log(cityName);
